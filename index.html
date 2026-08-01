@@ -191,7 +191,7 @@ function App() {
   if (!loaded) {
     return (
       <div style={{ background: COLORS.ink, minHeight: "100vh" }} className="flex items-center justify-center">
-        <p style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-sm tracking-widest">OPENING LEDGER…</p>
+        <p style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-base tracking-widest">OPENING LEDGER…</p>
       </div>
     );
   }
@@ -211,9 +211,9 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
   return (
     <div className="max-w-3xl mx-auto px-5 pb-24 pt-10 md:pt-16">
       <header className="mb-10 text-center">
-        <p style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace", letterSpacing: "0.3em" }} className="text-[11px] mb-3 uppercase">A Stewardship Ledger</p>
-        <h1 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-5xl md:text-6xl font-semibold tracking-tight">FAITHFUL</h1>
-        <p style={{ color: COLORS.slate }} className="mt-3 text-sm max-w-md mx-auto leading-relaxed">"Well done, good and faithful servant." — Matthew 25:21</p>
+        <p style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace", letterSpacing: "0.3em" }} className="text-[13px] mb-3 uppercase">A Stewardship Ledger</p>
+        <h1 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-6xl md:text-7xl font-semibold tracking-tight">FAITHFUL</h1>
+        <p style={{ color: COLORS.slate }} className="mt-3 text-base max-w-md mx-auto leading-relaxed">"Well done, good and faithful servant." — Matthew 25:21</p>
       </header>
 
       <div style={{ background: COLORS.inkRaised, border: `1px solid ${COLORS.inkLine}` }} className="rounded-lg grid grid-cols-3 divide-x mb-8">
@@ -222,7 +222,7 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
         <Stat value={`${overallPercent}%`} label="Faithfulness" />
       </div>
 
-      <button onClick={() => openDay(nextDay)} style={{ background: COLORS.brass, color: COLORS.ink }} className="w-full rounded-lg py-3.5 mb-10 font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition">
+      <button onClick={() => openDay(nextDay)} style={{ background: COLORS.brass, color: COLORS.ink }} className="w-full rounded-lg py-3.5 mb-10 font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 transition">
         {totalComplete >= 90 ? "Review Day 90" : `Continue — Day ${nextDay}`}
         <ChevronRight size={16} />
       </button>
@@ -231,7 +231,7 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
         {WEEKS.map((w) => <WeekRow key={w.week} week={w} progress={progress} nextDay={nextDay} openDay={openDay} />)}
       </div>
 
-      <p style={{ color: COLORS.slateDim }} className="text-center text-xs mt-12 leading-relaxed">
+      <p style={{ color: COLORS.slateDim }} className="text-center text-sm mt-12 leading-relaxed">
         One miss never becomes permission to abandon the day.<br />Return at the next available decision.
       </p>
     </div>
@@ -241,8 +241,8 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
 function Stat({ icon, value, label }) {
   return (
     <div className="flex flex-col items-center justify-center py-4">
-      <div style={{ color: COLORS.parchment, fontFamily: "'IBM Plex Mono', monospace" }} className="text-xl font-semibold flex items-center gap-1.5">{icon}{value}</div>
-      <div style={{ color: COLORS.slate }} className="text-[10px] uppercase tracking-wider mt-1">{label}</div>
+      <div style={{ color: COLORS.parchment, fontFamily: "'IBM Plex Mono', monospace" }} className="text-2xl font-semibold flex items-center gap-1.5">{icon}{value}</div>
+      <div style={{ color: COLORS.slate }} className="text-[12px] uppercase tracking-wider mt-1">{label}</div>
     </div>
   );
 }
@@ -252,8 +252,8 @@ function WeekRow({ week, progress, nextDay, openDay }) {
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2 px-0.5">
-        <h2 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-sm font-semibold">
-          <span style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="mr-2 text-xs">{String(week.week).padStart(2, "0")}</span>
+        <h2 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-base font-semibold">
+          <span style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="mr-2 text-sm">{String(week.week).padStart(2, "0")}</span>
           {week.title}
         </h2>
       </div>
@@ -266,7 +266,7 @@ function WeekRow({ week, progress, nextDay, openDay }) {
           return (
             <button key={d.day} onClick={() => openDay(d.day)} title={`Day ${d.day} — ${d.title}`}
               style={{ background: score > 0 ? `rgba(180,137,79,${opacity})` : COLORS.inkRaised, border: isNext ? `1px solid ${COLORS.brassBright}` : `1px solid ${COLORS.inkLine}`, color: score >= 4 ? COLORS.ink : COLORS.slate, fontFamily: "'IBM Plex Mono', monospace" }}
-              className="aspect-square rounded-[3px] text-[10px] flex items-center justify-center hover:brightness-110 transition">
+              className="aspect-square rounded-[3px] text-[12px] flex items-center justify-center hover:brightness-110 transition">
               {d.day}
             </button>
           );
@@ -295,21 +295,21 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
   return (
     <div className="max-w-2xl mx-auto px-5 pb-28 pt-8 md:pt-10">
       <div className="flex items-center justify-between mb-6">
-        <button onClick={() => setView("dashboard")} style={{ color: COLORS.slate }} className="flex items-center gap-1 text-xs hover:text-white transition">
+        <button onClick={() => setView("dashboard")} style={{ color: COLORS.slate }} className="flex items-center gap-1 text-sm hover:text-white transition">
           <ChevronLeft size={14} /> Ledger
         </button>
-        <div style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-[11px] tracking-wider">WEEK {String(day.week).padStart(2, "0")} · DAY {String(dayNum).padStart(2, "0")} / 90</div>
+        <div style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-[13px] tracking-wider">WEEK {String(day.week).padStart(2, "0")} · DAY {String(dayNum).padStart(2, "0")} / 90</div>
       </div>
 
-      <h1 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-3xl md:text-4xl font-semibold leading-tight mb-4">{day.title}</h1>
+      <h1 style={{ color: COLORS.parchment, fontFamily: "'Source Serif 4', serif" }} className="text-4xl md:text-5xl font-semibold leading-tight mb-4">{day.title}</h1>
 
-      <div style={{ background: COLORS.inkRaised, border: `1px solid ${COLORS.inkLine}`, color: COLORS.slate }} className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs mb-6">
+      <div style={{ background: COLORS.inkRaised, border: `1px solid ${COLORS.inkLine}`, color: COLORS.slate }} className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm mb-6">
         <BookOpen size={13} style={{ color: COLORS.brass }} /> Read: {day.read}
       </div>
 
-      <div style={{ borderLeft: `3px solid ${COLORS.brass}`, color: COLORS.brassBright, fontFamily: "'Source Serif 4', serif" }} className="pl-4 py-1 mb-6 text-lg italic leading-snug">{day.keyTruth}</div>
+      <div style={{ borderLeft: `3px solid ${COLORS.brass}`, color: COLORS.brassBright, fontFamily: "'Source Serif 4', serif" }} className="pl-4 py-1 mb-6 text-xl italic leading-snug">{day.keyTruth}</div>
 
-      <p style={{ color: "#C9CDD4" }} className="text-[15px] leading-relaxed mb-10">{day.body}</p>
+      <p style={{ color: "#C9CDD4" }} className="text-[17px] leading-relaxed mb-10">{day.body}</p>
 
       <Section title="Reflect">
         <ReflectField label={day.reflect[0]} value={r1} onChange={(v) => { setR1(v); updateDay(dayNum, { reflect: [v, r2] }); }} />
@@ -317,7 +317,7 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
       </Section>
 
       <Section title="Pray">
-        <p style={{ color: "#C9CDD4", fontFamily: "'Source Serif 4', serif" }} className="text-[15px] italic leading-relaxed">{day.pray}</p>
+        <p style={{ color: "#C9CDD4", fontFamily: "'Source Serif 4', serif" }} className="text-[17px] italic leading-relaxed">{day.pray}</p>
       </Section>
 
       <Section title="Today's Obedience Action">
@@ -327,7 +327,7 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
           <span style={{ background: entry.actionDone ? COLORS.faithful : "transparent", border: `1.5px solid ${entry.actionDone ? COLORS.faithful : COLORS.slate}` }} className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center">
             {entry.actionDone && <Check size={11} color={COLORS.ink} strokeWidth={3} />}
           </span>
-          <span style={{ color: COLORS.parchment }} className="text-sm leading-relaxed">{day.action}</span>
+          <span style={{ color: COLORS.parchment }} className="text-base leading-relaxed">{day.action}</span>
         </button>
       </Section>
 
@@ -338,7 +338,7 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
             return (
               <button key={f.key} onClick={() => toggleScore(dayNum, f.key)}
                 style={{ background: checked ? "rgba(180,137,79,0.15)" : COLORS.inkRaised, border: `1px solid ${checked ? COLORS.brass : COLORS.inkLine}`, color: checked ? COLORS.brassBright : COLORS.slate }}
-                className="flex items-center gap-2 rounded-md px-3 py-2.5 text-xs font-medium transition">
+                className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition">
                 {checked ? <Check size={13} /> : <Circle size={13} />}
                 {f.label}
               </button>
@@ -350,24 +350,24 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
       <Section title="Where did I notice God today?">
         <textarea value={notice} onChange={(e) => { setNotice(e.target.value); updateDay(dayNum, { noticedGod: e.target.value }); }} rows={2}
           style={{ background: COLORS.parchment, color: COLORS.parchmentText, border: `1px solid ${COLORS.inkLine}` }}
-          className="w-full rounded-md p-3 text-sm leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
+          className="w-full rounded-md p-3 text-base leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
       </Section>
 
       <Section title="What needs correction tomorrow?">
         <textarea value={correction} onChange={(e) => { setCorrection(e.target.value); updateDay(dayNum, { correction: e.target.value }); }} rows={2}
           style={{ background: COLORS.parchment, color: COLORS.parchmentText, border: `1px solid ${COLORS.inkLine}` }}
-          className="w-full rounded-md p-3 text-sm leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
+          className="w-full rounded-md p-3 text-base leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
       </Section>
 
-      <div style={{ color: COLORS.slateDim, fontFamily: "'IBM Plex Mono', monospace" }} className="h-4 text-center text-[10px] mb-6 tracking-wider">
+      <div style={{ color: COLORS.slateDim, fontFamily: "'IBM Plex Mono', monospace" }} className="h-4 text-center text-[12px] mb-6 tracking-wider">
         {saveState === "saving" ? "SAVING…" : saveState === "saved" ? "SAVED" : ""}
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <button onClick={() => goTo(dayNum - 1)} disabled={dayNum <= 1} style={{ border: `1px solid ${COLORS.inkLine}`, color: COLORS.slate, opacity: dayNum <= 1 ? 0.3 : 1 }} className="flex-1 rounded-lg py-3 text-xs font-medium flex items-center justify-center gap-1">
+        <button onClick={() => goTo(dayNum - 1)} disabled={dayNum <= 1} style={{ border: `1px solid ${COLORS.inkLine}`, color: COLORS.slate, opacity: dayNum <= 1 ? 0.3 : 1 }} className="flex-1 rounded-lg py-3 text-sm font-medium flex items-center justify-center gap-1">
           <ChevronLeft size={14} /> Day {dayNum - 1}
         </button>
-        <button onClick={() => goTo(dayNum + 1)} disabled={dayNum >= 90} style={{ background: COLORS.brass, color: COLORS.ink, opacity: dayNum >= 90 ? 0.3 : 1 }} className="flex-1 rounded-lg py-3 text-xs font-semibold flex items-center justify-center gap-1">
+        <button onClick={() => goTo(dayNum + 1)} disabled={dayNum >= 90} style={{ background: COLORS.brass, color: COLORS.ink, opacity: dayNum >= 90 ? 0.3 : 1 }} className="flex-1 rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-1">
           Day {dayNum + 1} <ChevronRight size={14} />
         </button>
       </div>
@@ -378,7 +378,7 @@ function DayView({ dayNum, entry, setView, setActiveDay, updateDay, toggleScore,
 function Section({ title, children }) {
   return (
     <div className="mb-8">
-      <h3 style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-[11px] uppercase tracking-widest mb-3">{title}</h3>
+      <h3 style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-[13px] uppercase tracking-widest mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -387,10 +387,10 @@ function Section({ title, children }) {
 function ReflectField({ label, value, onChange }) {
   return (
     <div className="mb-3">
-      <p style={{ color: "#C9CDD4" }} className="text-sm mb-1.5 leading-snug">{label}</p>
+      <p style={{ color: "#C9CDD4" }} className="text-base mb-1.5 leading-snug">{label}</p>
       <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2}
         style={{ background: COLORS.parchment, color: COLORS.parchmentText, border: `1px solid ${COLORS.inkLine}` }}
-        className="w-full rounded-md p-3 text-sm leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
+        className="w-full rounded-md p-3 text-base leading-relaxed resize-none focus:outline-none focus:ring-1" placeholder="…" />
     </div>
   );
 }
