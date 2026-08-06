@@ -44,15 +44,16 @@ const WEEKS = [{"week": 1, "title": "Identity in Christ", "subtitle": "Before yo
 
 /* ---------- localStorage-backed storage shim (mirrors the Claude artifact storage API) ---------- */
 const STORAGE_KEY = "faithful90:progress";
+const ACTIVITY_KEY = "faithful90:activity";
 const storage = {
-  get: async () => {
-    const raw = localStorage.getItem(STORAGE_KEY);
+  get: async (key = STORAGE_KEY) => {
+    const raw = localStorage.getItem(key);
     if (raw === null) return null;
-    return { key: STORAGE_KEY, value: raw };
+    return { key, value: raw };
   },
-  set: async (value) => {
-    localStorage.setItem(STORAGE_KEY, value);
-    return { key: STORAGE_KEY, value };
+  set: async (value, key = STORAGE_KEY) => {
+    localStorage.setItem(key, value);
+    return { key, value };
   },
 };
 
@@ -125,27 +126,50 @@ const COLORS = {
   faithful: "#5C8368",
 };
 
+function todayKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function App() {
   const [progress, setProgress] = useState({});
+  const [activity, setActivity] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [view, setView] = useState("dashboard");
   const [activeDay, setActiveDay] = useState(1);
   const [saveState, setSaveState] = useState("idle");
   const saveTimer = useRef(null);
   const progressRef = useRef({});
+  const activityRef = useRef({});
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await storage.get();
+        const res = await storage.get(STORAGE_KEY);
         if (res && res.value) {
           const parsed = JSON.parse(res.value);
           setProgress(parsed);
           progressRef.current = parsed;
         }
       } catch (e) {}
+      try {
+        const actRes = await storage.get(ACTIVITY_KEY);
+        if (actRes && actRes.value) {
+          const parsedAct = JSON.parse(actRes.value);
+          setActivity(parsedAct);
+          activityRef.current = parsedAct;
+        }
+      } catch (e) {}
       finally { setLoaded(true); }
     })();
+  }, []);
+
+  const markToday = useCallback(() => {
+    const key = todayKey();
+    if (activityRef.current[key]) return;
+    const next = { ...activityRef.current, [key]: true };
+    activityRef.current = next;
+    setActivity(next);
+    storage.set(JSON.stringify(next), ACTIVITY_KEY).catch(() => {});
   }, []);
 
   const persist = useCallback((next) => {
@@ -155,7 +179,7 @@ function App() {
     setSaveState("saving");
     saveTimer.current = setTimeout(async () => {
       try {
-        await storage.set(JSON.stringify(next));
+        await storage.set(JSON.stringify(next), STORAGE_KEY);
         setSaveState("saved");
         setTimeout(() => setSaveState("idle"), 1200);
       } catch (e) { setSaveState("idle"); }
@@ -166,6 +190,7 @@ function App() {
     const current = progressRef.current[dayNum] || emptyDay();
     const next = { ...progressRef.current, [dayNum]: { ...current, ...patch } };
     persist(next);
+    markToday();
   };
 
   const toggleScore = (dayNum, key) => {
@@ -175,6 +200,7 @@ function App() {
       [dayNum]: { ...current, scorecard: { ...current.scorecard, [key]: !current.scorecard[key] } },
     };
     persist(next);
+    markToday();
   };
 
   const completedDays = new Set(
@@ -199,7 +225,7 @@ function App() {
   return (
     <div style={{ background: COLORS.ink, minHeight: "100vh", fontFamily: "'Inter', sans-serif" }}>
       {view === "dashboard" ? (
-        <Dashboard progress={progress} currentStreak={currentStreak} totalComplete={totalComplete} overallPercent={overallPercent} nextDay={nextDay} openDay={openDay} />
+        <Dashboard progress={progress} activity={activity} currentStreak={currentStreak} totalComplete={totalComplete} overallPercent={overallPercent} nextDay={nextDay} openDay={openDay} />
       ) : (
         <DayView dayNum={activeDay} entry={progress[activeDay] || emptyDay()} setView={setView} setActiveDay={setActiveDay} updateDay={updateDay} toggleScore={toggleScore} saveState={saveState} />
       )}
@@ -207,7 +233,7 @@ function App() {
   );
 }
 
-function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nextDay, openDay }) {
+function Dashboard({ progress, activity, currentStreak, totalComplete, overallPercent, nextDay, openDay }) {
   return (
     <div className="max-w-3xl mx-auto px-5 pb-24 pt-10 md:pt-16">
       <header className="mb-10 text-center">
@@ -216,11 +242,13 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
         <p style={{ color: COLORS.slate }} className="mt-3 text-base max-w-md mx-auto leading-relaxed">"Well done, good and faithful servant." — Matthew 25:21</p>
       </header>
 
-      <div style={{ background: COLORS.inkRaised, border: `1px solid ${COLORS.inkLine}` }} className="rounded-lg grid grid-cols-3 divide-x mb-8">
+      <div style={{ background: COLORS.inkRaised, border: `1px solid ${COLORS.inkLine}` }} className="rounded-lg grid grid-cols-3 divide-x mb-6">
         <Stat icon={<Flame size={16} style={{ color: COLORS.brass }} />} value={currentStreak} label="Day streak" />
         <Stat value={`${totalComplete}/90`} label="Days complete" />
         <Stat value={`${overallPercent}%`} label="Faithfulness" />
       </div>
+
+      <ActivityStrip activity={activity} />
 
       <button onClick={() => openDay(nextDay)} style={{ background: COLORS.brass, color: COLORS.ink }} className="w-full rounded-lg py-3.5 mb-10 font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 transition">
         {totalComplete >= 90 ? "Review Day 90" : `Continue — Day ${nextDay}`}
@@ -234,6 +262,61 @@ function Dashboard({ progress, currentStreak, totalComplete, overallPercent, nex
       <p style={{ color: COLORS.slateDim }} className="text-center text-sm mt-12 leading-relaxed">
         One miss never becomes permission to abandon the day.<br />Return at the next available decision.
       </p>
+    </div>
+  );
+}
+
+function ActivityStrip({ activity }) {
+  const cells = [];
+  const today = new Date();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = todayKey(d);
+    cells.push({
+      key,
+      label: d.getDate(),
+      weekday: "SMTWTFS"[d.getDay()],
+      isToday: i === 0,
+      done: !!activity[key],
+    });
+  }
+  const missedCount = cells.filter((c) => !c.isToday && !c.done).length;
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-2 px-0.5">
+        <h2 style={{ color: COLORS.brass, fontFamily: "'IBM Plex Mono', monospace" }} className="text-sm uppercase tracking-widest">
+          Last 14 Days
+        </h2>
+        {missedCount > 0 && (
+          <span style={{ color: "#C08469", fontFamily: "'IBM Plex Mono', monospace" }} className="text-sm">
+            {missedCount} missed
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-7 gap-1.5">
+        {cells.map((c) => (
+          <div
+            key={c.key}
+            title={c.done ? `${c.key} — logged` : c.isToday ? `${c.key} — today` : `${c.key} — missed`}
+            style={{
+              background: c.done ? "rgba(180,137,79,0.22)" : c.isToday ? COLORS.inkRaised : "rgba(161,92,74,0.10)",
+              border: c.done
+                ? `1px solid ${COLORS.brass}`
+                : c.isToday
+                ? `1px dashed ${COLORS.brassBright}`
+                : "1px solid rgba(161,92,74,0.45)",
+              color: c.done ? COLORS.brassBright : c.isToday ? COLORS.slate : "#C08469",
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+            className="aspect-square rounded-[3px] flex flex-col items-center justify-center"
+          >
+            <span className="text-[10px] opacity-60">{c.weekday}</span>
+            <span className="text-sm leading-none mt-0.5">{c.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
